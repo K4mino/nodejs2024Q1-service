@@ -1,3 +1,5 @@
+import { IsNotEmpty } from "class-validator";
+
 interface ICreateAlbumDto {
         name: string;
         year: number;
@@ -5,12 +7,14 @@ interface ICreateAlbumDto {
     }
 
 export class CreateAlbumDto implements ICreateAlbumDto{
+    @IsNotEmpty()
     name: string;
+    @IsNotEmpty()
     year: number;
     artistId: string | null;
     constructor(name: string, year: number, artistId: string | null) {
         this.name = name;
         this.year = year;
-        this.artistId = artistId;
+        this.artistId = artistId || null;
     }
 }

@@ -1,21 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode,ParseUUIDPipe } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { validate } from 'uuid';
 import { validate as classValidate }  from 'class-validator';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
+import { Put } from '@nestjs/common/decorators';
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Post()
-  async create(@Body() createArtistDto: CreateArtistDto) {
-    const errors =await classValidate(createArtistDto)
+  create(@Body() createArtistDto: CreateArtistDto) {
 
-    if(errors.length > 0) {
-      throw new BadRequestException(errors.toString());
-    }
     return this.artistService.create(createArtistDto);
   }
 
@@ -25,10 +22,7 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    if(!validate(id)) {
-      throw new BadRequestException('Invalid artist id'); ;
-    }
+  findOne(@Param('id',new ParseUUIDPipe()) id: string) {
 
     const artist = this.artistService.findOne(id)
 
@@ -39,12 +33,8 @@ export class ArtistController {
     return artist;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    if(!validate(id)) {
-      throw new BadRequestException('Invalid artist id'); ;
-    }
-
+  @Put(':id')
+  update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateArtistDto: UpdateArtistDto) {
     const artist = this.artistService.findOne(id)
 
     if(!artist){
@@ -55,11 +45,7 @@ export class ArtistController {
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    if(!validate(id)) {
-      throw new BadRequestException('Invalid artist id'); ;
-    }
-
+  remove(@Param('id',new ParseUUIDPipe()) id: string) {
     const artist = this.artistService.findOne(id)
 
     if(!artist){

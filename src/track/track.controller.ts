@@ -5,18 +5,13 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 import { validate } from 'uuid';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
 import { validate as classValidate }  from 'class-validator';
+import { Put } from '@nestjs/common/decorators';
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  async create(@Body() createTrackDto: CreateTrackDto) {
-    const errors =await classValidate(createTrackDto)
-
-    if(errors.length > 0) {
-      throw new BadRequestException(errors.toString());
-    }
-
+  create(@Body() createTrackDto: CreateTrackDto) {
     return this.trackService.create(createTrackDto);
   }
 
@@ -36,9 +31,8 @@ export class TrackController {
     return track;
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateTrackDto: UpdateTrackDto) {
-
     const track = this.trackService.findOne(id)
 
     if(!track){

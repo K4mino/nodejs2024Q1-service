@@ -39,7 +39,11 @@ export class FavoriteService {
     const albums = findAllByIds('albums');
     const tracks = findAllByIds('tracks');
    
-    return [...albums, ...artists, ...tracks];
+    return {
+      artists,
+      albums,
+      tracks
+    };
   }
 
   update(id: string, updateFavoriteDto: UpdateFavoriteDto) {
