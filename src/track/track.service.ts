@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { db } from 'src/db';
@@ -25,16 +25,16 @@ export class TrackService {
   }
 
   update(id: string, updateTrackDto: UpdateTrackDto) {
-    const track = db.tracks.find(track => track.id === id);
+    const trackIndex = db.tracks.findIndex(track => track.id === id);
 
-    track.name = updateTrackDto.name;
-    track.artistId = updateTrackDto.artistId;
-    track.albumId = updateTrackDto.albumId;
-    track.duration = updateTrackDto.duration;
-
-    return {
-      ...track,
+    const updatedTrack = {
+        ...db.tracks[trackIndex],
+        ...updateTrackDto,
     };
+
+    db.tracks[trackIndex] = updatedTrack;
+
+    return updatedTrack;
   }
 
   remove(id: string) {

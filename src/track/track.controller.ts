@@ -1,15 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode,ParseUUIDPipe } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { validate } from 'uuid';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common/exceptions';
+import { validate as classValidate }  from 'class-validator';
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  create(@Body() createTrackDto: CreateTrackDto) {
+  async create(@Body() createTrackDto: CreateTrackDto) {
+    const errors =await classValidate(createTrackDto)
+
+    if(errors.length > 0) {
+      throw new BadRequestException(errors.toString());
+    }
+
     return this.trackService.create(createTrackDto);
   }
 
@@ -19,11 +26,7 @@ export class TrackController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Invalid track id'); ;
-    }
-
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     const track = this.trackService.findOne(id)
 
     if(!track){
@@ -34,7 +37,26 @@ export class TrackController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
+  async update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateTrackDto: UpdateTrackDto) {
+
+    const track = this.trackService.findOne(id)
+
+    if(!track){
+      throw new NotFoundException('Track not found');
+    }
+
+    const errors = await classValidate(updateTrackDto)
+
+    if(errors.length > 0) {
+      throw new BadRequestException(errors.toString());
+    }
+
+    return this.trackService.update(id, updateTrackDto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id',new ParseUUIDPipe()) id: string) {
     if (!validate(id)) {
       throw new BadRequestException('Invalid track id'); ;
     }
@@ -43,15 +65,6 @@ export class TrackController {
 
     if(!track){
       throw new NotFoundException('Track not found');
-    }
-    return this.trackService.update(id, updateTrackDto);
-  }
-
-  @Delete(':id')
-  @HttpCode(204)
-  remove(@Param('id') id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Invalid track id'); ;
     }
 
     return this.trackService.remove(id);

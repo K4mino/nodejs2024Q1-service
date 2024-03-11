@@ -8,16 +8,11 @@ interface Database  {
     albums?: Album[];
     tracks?: Track[];
     artists?: Artist[];
-    favs?: {
-        artists?: string[];
-        albums?: string[];
-        tracks?: string[];
-    };
+    favs?: Favorite;
 }
 
 export const db: Database ={
     users: [
-        new User('1', 'john', 'lennon', 0, 0, 0)
     ],
     albums: [
         
@@ -29,6 +24,8 @@ export const db: Database ={
         
     ],
     favs: {
-        
+        albums: [],
+        artists: [],
+        tracks: [],
     }
 }

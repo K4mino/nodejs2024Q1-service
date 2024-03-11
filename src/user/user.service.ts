@@ -17,7 +17,9 @@ export class UserService {
 
     db.users.push(newUSer);
 
-    return newUSer;
+    return {
+      login: newUSer.login,
+    };
   }
 
   findAll() {
@@ -26,10 +28,6 @@ export class UserService {
 
   findOne(id: string) {
     const user = db.users.find(user => user.id === id)
-
-    if(!user){
-        return null;
-    }
 
     return user;
   }
