@@ -1,51 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException,ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { db } from 'src/db';
 import {v4} from 'uuid'
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    const newUSer = {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = {
       ...createUserDto,
       id:v4(),
       version: 0,
       createdAt: Date.now(),
       updatedAt: Date.now()
-    };  
-
-    db.users.push(newUSer);
-
-    return {
-      login: newUSer.login,
     };
+
+    const user = this.userRepository.create(newUser);
+    return await this.userRepository.save(user);  
   }
 
-  findAll() {
-    return db.users;
+  async findAll(): Promise<User[]> {
+    return await this.userRepository.find();
   }
 
-  findOne(id: string) {
-    const user = db.users.find(user => user.id === id)
+  async findOne(id: string): Promise<User> {
+    const user = this.userRepository.findOne({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
     return user;
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    const user = db.users.find(user => user.id === id);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
 
-    user.password = updateUserDto.newPassword;
+    if(!user){
+      throw new NotFoundException('User not found');
+    }
+
+    if(user.password !== updateUserDto.oldPassword){
+      throw new ForbiddenException('Wrong password');
+    }
     user.updatedAt = Date.now();
-
-    return user.login ;
+    this.userRepository.merge(user, updateUserDto);
+    return user
   }
 
-  remove(id: string) {
-    const user = db.users.find(user => user.id === id);
-   
-    db.users = db.users.filter(user => user.id !== id);
-
-    return user;
+  async remove(id: string) {
+    return await this.userRepository.delete(id);
   }
 }

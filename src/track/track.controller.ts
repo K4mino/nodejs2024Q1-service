@@ -51,10 +51,6 @@ export class TrackController {
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id',new ParseUUIDPipe()) id: string) {
-    if (!validate(id)) {
-      throw new BadRequestException('Invalid track id'); ;
-    }
-
     const track = this.trackService.findOne(id)
 
     if(!track){

@@ -1,3 +1,4 @@
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 interface IUser {
     id: string; // uuid v4
     login: string;
@@ -7,12 +8,19 @@ interface IUser {
     updatedAt: number; // timestamp of last update
   }
 
+@Entity()
 export class User implements IUser {
+    @PrimaryGeneratedColumn()
     id: string; 
+    @Column('text')
     login: string;
+    @Column('text')
     password: string;
-    version: number; 
-    createdAt: number; 
+    @Column('int')
+    version: number;
+    @Column( { default: 0 } ) 
+    createdAt: number;
+    @Column( { default: 0 } ) 
     updatedAt: number; 
 
     constructor(id: string, login: string, password: string, version: number, createdAt: number, updatedAt: number) {
