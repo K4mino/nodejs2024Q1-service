@@ -1,3 +1,6 @@
+import { Album } from 'src/album/entities/album.entity';
+import { Artist } from 'src/artist/entities/artist.entity';
+import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
 interface ITrack {
     id: string; // uuid v4
     name: string;
@@ -5,18 +8,20 @@ interface ITrack {
     albumId: string | null; // refers to Album
     duration: number; // integer number
   }
-
+@Entity()
 export class Track implements ITrack{
+    @PrimaryGeneratedColumn('uuid')
     id: string; 
+    @Column('text')
     name: string;
+    @ManyToOne(() => Artist)
+    artist: Artist; 
+    @RelationId((track: Track) => track.artistId)
     artistId: string | null; 
+    @ManyToOne(() => Album)
+    album: Album; 
+    @RelationId((track: Track) => track.albumId)
     albumId: string | null; 
-    duration: number; 
-    constructor(id: string, name: string, artistId: string | null, albumId: string | null, duration: number) {
-        this.id = id;
-        this.name = name;
-        this.artistId = artistId;
-        this.albumId = albumId;
-        this.duration = duration;
-    }
+    @Column('int')
+    duration: number;
 }

@@ -1,29 +1,29 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 interface IUser {
     id: string; // uuid v4
     login: string;
     password: string;
     version: number; // integer number, increments on update
-    createdAt: number; // timestamp of creation
-    updatedAt: number; // timestamp of last update
+    createdAt: Date; // timestamp of creation
+    updatedAt: Date; // timestamp of last update
   }
 
 @Entity()
 export class User implements IUser {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string; 
     @Column('text')
     login: string;
     @Column('text')
     password: string;
-    @Column('int')
+    @VersionColumn()
     version: number;
-    @Column( { default: 0 } ) 
-    createdAt: number;
-    @Column( { default: 0 } ) 
-    updatedAt: number; 
+    @CreateDateColumn({ type: 'timestamp' } ) 
+    createdAt: Date;
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date; 
 
-    constructor(id: string, login: string, password: string, version: number, createdAt: number, updatedAt: number) {
+    constructor(id: string, login: string, password: string, version: number, createdAt: Date, updatedAt: Date) {
         this.id = id;
         this.login = login;
         this.password = password;

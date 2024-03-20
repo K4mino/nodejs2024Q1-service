@@ -3,17 +3,23 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { db } from 'src/db';
 import { v4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Track } from './entities/track.entity';
 @Injectable()
 export class TrackService {
-  create(createTrackDto: CreateTrackDto) {
+  constructor(
+    @InjectRepository(Track)
+    private readonly trackRepository: Repository<Track>,
+  ) {}
+  async create(createTrackDto: CreateTrackDto) {
     const newTrack = {
       ...createTrackDto,
       id: v4(),
     };
 
-    db.tracks.push(newTrack);
-
-    return newTrack;
+    const user = this.trackRepository.create(newTrack);
+    return await this.trackRepository.save(user);
   }
 
   findAll() {

@@ -17,8 +17,8 @@ export class UserService {
       ...createUserDto,
       id:v4(),
       version: 0,
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     const user = this.userRepository.create(newUser);
@@ -49,8 +49,9 @@ export class UserService {
     if(user.password !== updateUserDto.oldPassword){
       throw new ForbiddenException('Wrong password');
     }
-    user.updatedAt = Date.now();
-    this.userRepository.merge(user, updateUserDto);
+    user.updatedAt = new Date();
+    user.password = updateUserDto.newPassword;
+    this.userRepository.save(user);
     return user
   }
 

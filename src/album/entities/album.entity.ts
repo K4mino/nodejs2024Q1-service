@@ -1,19 +1,23 @@
+import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
+import { Artist } from 'src/artist/entities/artist.entity';
 interface IAlbum {
     id: string; // uuid v4
     name: string;
     year: number;
     artistId: string | null; // refers to Artist
   }
-
+@Entity()
 export class Album implements IAlbum{
+    @PrimaryGeneratedColumn('uuid')
     id: string; 
+    @Column('text')
     name: string;
+    @Column('int')
     year: number;
+
+    @ManyToOne(() => Artist)
+    artist: Artist; // Define the reference to the Artist entity
+
+    @RelationId((album: Album) => album.artistId)
     artistId: string | null; 
-    constructor(id: string, name: string, year: number, artistId: string | null) {
-        this.id = id;
-        this.name = name;
-        this.year = year;
-        this.artistId = artistId;
-    }
 }
