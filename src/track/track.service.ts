@@ -22,32 +22,43 @@ export class TrackService {
     return await this.trackRepository.save(user);
   }
 
-  findAll() {
-    return db.tracks;
+  async findAll() {
+    return await this.trackRepository.find();
   }
 
-  findOne(id: string) {
-    return db.tracks.find(track => track.id === id);
+  async findOne(id: string) {
+    const track = await this.trackRepository.findOne({ where: { id } });
+
+    if(!track){
+      throw new  NotFoundException('Track not found');
+    }
+
+    return track
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
-    const trackIndex = db.tracks.findIndex(track => track.id === id);
+  async update(id: string, updateTrackDto: UpdateTrackDto) {
+    const track = await this.trackRepository.findOne({ where: { id } });
+
+    if(!track){
+      throw new NotFoundException('User not found');
+    }
 
     const updatedTrack = {
-        ...db.tracks[trackIndex],
-        ...updateTrackDto,
-    };
-
-    db.tracks[trackIndex] = updatedTrack;
-
-    return updatedTrack;
+      ...track,
+      ...updateTrackDto
+    }
+   
+    return updatedTrack
   }
 
-  remove(id: string) {
-    const track = db.tracks.find(track => track.id === id);
+  async remove(id: string) {
+    const track = await this.trackRepository.findOne({ where: { id } });
 
-    db.tracks = db.tracks.filter(track => track.id !== id);
-    db.favs.tracks = db.favs.tracks.filter(trackId => trackId !== id);
-    return track;
+    if(!track){
+      throw new NotFoundException('User not found');
+    }
+    
+
+    return await this.trackRepository.delete(id);
   }
 }

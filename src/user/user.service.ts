@@ -29,17 +29,17 @@ export class UserService {
     return await this.userRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: string) {
     const user = this.userRepository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    return user;
+    const { password, ...userWithoutPassword } =await user;
+    return  userWithoutPassword;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOne({ where: { id } });
 
     if(!user){
@@ -51,11 +51,17 @@ export class UserService {
     }
     user.updatedAt = new Date();
     user.password = updateUserDto.newPassword;
-    this.userRepository.save(user);
-    return user
+    const {password,...userUpdated} = await this.userRepository.save(user);
+    return userUpdated
   }
 
   async remove(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+
+    if(!user){
+      throw new NotFoundException('User not found');
+    }
+    
     return await this.userRepository.delete(id);
   }
 }

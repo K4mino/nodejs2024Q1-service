@@ -1,6 +1,7 @@
 import { Album } from 'src/album/entities/album.entity';
 import { Artist } from 'src/artist/entities/artist.entity';
-import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
+import { Favorite } from 'src/favorite/entities/favorite.entity';
+import { Entity, PrimaryGeneratedColumn, Column,ManyToMany, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
 interface ITrack {
     id: string; // uuid v4
     name: string;
@@ -14,14 +15,16 @@ export class Track implements ITrack{
     id: string; 
     @Column('text')
     name: string;
-    @ManyToOne(() => Artist)
+    @ManyToOne(() => Artist, { onDelete: 'SET NULL' })
     artist: Artist; 
-    @RelationId((track: Track) => track.artistId)
-    artistId: string | null; 
-    @ManyToOne(() => Album)
+    @Column('uuid') 
+    artistId: string | null;
+    @ManyToOne(() => Album, { onDelete: 'SET NULL' })
     album: Album; 
-    @RelationId((track: Track) => track.albumId)
-    albumId: string | null; 
+    @Column('uuid')
+    albumId: string | null;
     @Column('int')
     duration: number;
+    @ManyToMany(() => Favorite, favorite => favorite.tracks)
+    favorites: Favorite[];
 }
