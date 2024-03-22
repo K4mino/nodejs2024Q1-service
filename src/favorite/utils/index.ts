@@ -1,10 +1,25 @@
-import { db } from 'src/db';
 
-const findAllByIds = (entity) =>{
+const findAllByIds = (entity,service,favorites) =>{
     const res = []
-    for(const id of db.favs[entity]){
-        res.push(db[entity].find(entity => entity.id === id))
+    
+    switch(entity){
+        case 'track':
+            favorites.tracks.forEach(id => {
+                const track = service.findOne(id);
+                res.push(track)
+            })
+        case 'album':
+            favorites.albums.forEach(id => {
+                const album = service.findOne(id);
+                res.push(album)
+            })
+        case 'artist':
+            favorites.artists.forEach(id => {
+                const artist = service.findOne(id);
+                res.push(artist)
+            })
     }
+
     return res
 }
 

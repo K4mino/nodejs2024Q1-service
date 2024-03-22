@@ -1,54 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { db } from 'src/db';
 import { v4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Artist } from './entities/artist.entity';
 @Injectable()
 export class ArtistService {
-  create(createArtistDto: CreateArtistDto) {
+  constructor(
+    @InjectRepository(Artist)
+    private readonly artistRepository: Repository<Artist>,
+  ){}
+  async create(createArtistDto: CreateArtistDto) {
     const artist = {
       ...createArtistDto,
       id: v4(),
     }
 
-    db.artists.push(artist);
+    const newArtist = await this.artistRepository.create(artist);
+
+    return await this.artistRepository.save(newArtist);
+  }
+
+  async findAll() {
+    return await this.artistRepository.find();
+  }
+
+  async findOne(id: string) {
+    const artist= await this.artistRepository.findOne({ where: { id } });
+
+    if(!artist){
+      throw new NotFoundException('Artist not found');
+    }
 
     return artist;
   }
 
-  findAll() {
-    return db.artists;
-  }
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
-  findOne(id: string) {
-    return db.artists.find(artist => artist.id === id);
-  }
+    if(!artist){
+      throw new NotFoundException('Artist not found');
+    }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const artist = db.artists.find(artist => artist.id === id);
+    Object.assign(artist, updateArtistDto);
 
-    artist.name = updateArtistDto.name;
+    await this.artistRepository.save(artist);
 
     return artist;
   }
 
-  remove(id: string) {
-    const artist = db.artists.find(artist => artist.id === id);
+  async remove(id: string) {
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
-    db.artists = db.artists.filter(artist => artist.id !== id);
-    db.tracks = db.tracks.map((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
-      return track
-    });
-    db.albums = db.albums.map((album) => {
-      if (album.artistId === id) {
-        album.artistId = null;
-      }
-      return album
-    })
-    db.favs.artists = db.favs.artists.filter(artistId => artistId !== id);
-    return artist;
+    if(!artist){
+      throw new NotFoundException('Artist not found');
+    }
+
+    return await this.artistRepository.delete(id);
   }
 }

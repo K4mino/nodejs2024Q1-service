@@ -3,6 +3,7 @@ FROM node:20.11.0-alpine AS dev
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
+RUN npm install -g @nestjs/cli 
 COPY . .
 
 # Stage 2: Build the application

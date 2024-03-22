@@ -16,8 +16,8 @@ export class Album implements IAlbum{
     year: number;
 
     @ManyToOne(() => Artist)
-    artist: Artist; // Define the reference to the Artist entity
+    artist: Artist;
 
-    @RelationId((album: Album) => album.artistId)
+    @Column('uuid')
     artistId: string | null; 
 }

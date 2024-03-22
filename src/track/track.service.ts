@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { db } from 'src/db';
 import { v4 } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,8 +17,8 @@ export class TrackService {
       id: v4(),
     };
 
-    const user = this.trackRepository.create(newTrack);
-    return await this.trackRepository.save(user);
+    const track = this.trackRepository.create(newTrack);
+    return await this.trackRepository.save(track);
   }
 
   async findAll() {
@@ -40,25 +39,23 @@ export class TrackService {
     const track = await this.trackRepository.findOne({ where: { id } });
 
     if(!track){
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Track not found');
     }
 
-    const updatedTrack = {
-      ...track,
-      ...updateTrackDto
-    }
-   
-    return updatedTrack
+    Object.assign(track, updateTrackDto);
+
+    await this.trackRepository.save(track);
+
+    return track
   }
 
   async remove(id: string) {
     const track = await this.trackRepository.findOne({ where: { id } });
 
     if(!track){
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Track not found');
     }
     
-
     return await this.trackRepository.delete(id);
   }
 }

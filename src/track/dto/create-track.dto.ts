@@ -1,5 +1,4 @@
-import { IsNotEmpty } from "class-validator";
-
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 interface ICreateTrackDto {
     name: string;
     artistId: string | null;
@@ -8,17 +7,16 @@ interface ICreateTrackDto {
 }
 
 export class CreateTrackDto implements ICreateTrackDto{
+    @IsString()
     @IsNotEmpty()
     name: string;
-    @IsNotEmpty()
+    @IsString()
+    @IsOptional()
     artistId: string | null;
+    @IsOptional()
+    @IsString()
     albumId: string | null;
     @IsNotEmpty()
+    @IsNumber()
     duration: number;
-    constructor(name: string, artistId: string | null, albumId: string | null, duration: number) {
-        this.name = name;
-        this.artistId = artistId || null;
-        this.albumId = albumId || null;
-        this.duration = duration;
-    }
 }

@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException,ForbiddenException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { db } from 'src/db';
 import {v4} from 'uuid'
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,17 +11,23 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto) {
     const newUser = {
       ...createUserDto,
       id:v4(),
-      version: 0,
+      version: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
     const user = this.userRepository.create(newUser);
-    return await this.userRepository.save(user);  
+    const savedUser = await this.userRepository.save(user);
+    const { password, ...createdUser } = savedUser
+    return  {
+      ...createdUser,
+      createdAt:+createdUser.createdAt,
+      updatedAt:+createdUser.updatedAt
+    };  
   }
 
   async findAll(): Promise<User[]> {
@@ -30,13 +35,13 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    const user = this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ select: ['id','login','version','createdAt','updatedAt'],where: { id } });
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }else {
+      return  user;
     }
-    const { password, ...userWithoutPassword } =await user;
-    return  userWithoutPassword;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -51,12 +56,17 @@ export class UserService {
     }
     user.updatedAt = new Date();
     user.password = updateUserDto.newPassword;
-    const {password,...userUpdated} = await this.userRepository.save(user);
-    return userUpdated
+    const updatedUser = await this.userRepository.save(user);
+    const { password, ...updatedUserWithoutPassword } = updatedUser;
+    return {
+      ...updatedUserWithoutPassword,
+      createdAt:+updatedUserWithoutPassword.createdAt,
+      updatedAt:+updatedUserWithoutPassword.updatedAt
+    };  ;
   }
 
   async remove(id: string) {
-    const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ select: ['id','login','version','createdAt','updatedAt'],where: { id } });
 
     if(!user){
       throw new NotFoundException('User not found');

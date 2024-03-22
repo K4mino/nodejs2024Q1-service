@@ -22,36 +22,16 @@ export class AlbumController {
 
   @Get(':id')
   findOne(@Param('id',new ParseUUIDPipe()) id: string) {
-
-    const album = this.albumService.findOne(id)
-
-    if(!album){
-      throw new NotFoundException('Album not found');
-    }
-
     return this.albumService.findOne(id);
   }
 
   @Put(':id')
   update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
-    const album = this.albumService.findOne(id)
-
-    if(!album){
-      throw new NotFoundException('Album not found');
-    }
-
     return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   remove(@Param('id',new ParseUUIDPipe()) id: string) {
-
-    const album = this.albumService.findOne(id)
-
-    if(!album){
-      throw new NotFoundException('Album not found');
-    }
-
     return this.albumService.remove(id);
   }
 }

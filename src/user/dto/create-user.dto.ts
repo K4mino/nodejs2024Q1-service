@@ -1,7 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 
 interface ICreateUserDto {
-    
     login: string;
     password: string;
   }

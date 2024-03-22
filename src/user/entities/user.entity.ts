@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 interface IUser {
     id: string; // uuid v4
@@ -22,13 +23,4 @@ export class User implements IUser {
     createdAt: Date;
     @UpdateDateColumn({ type: 'timestamp' })
     updatedAt: Date; 
-
-    constructor(id: string, login: string, password: string, version: number, createdAt: Date, updatedAt: Date) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
-        this.version = version;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
 }
