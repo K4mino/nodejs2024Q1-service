@@ -1,8 +1,8 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 interface ICreateTrackDto {
     name: string;
-    artistId: string | null;
-    albumId: string | null;
+    artistId?: string | null;
+    albumId?: string | null;
     duration: number;
 }
 
@@ -12,10 +12,10 @@ export class CreateTrackDto implements ICreateTrackDto{
     name: string;
     @IsString()
     @IsOptional()
-    artistId: string | null;
+    artistId?: string | null;
     @IsOptional()
     @IsString()
-    albumId: string | null;
+    albumId?: string | null;
     @IsNotEmpty()
     @IsNumber()
     duration: number;

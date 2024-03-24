@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { Artist } from 'src/artist/entities/artist.entity';
+import { Favorite } from 'src/favorite/entities/favorite.entity';
 interface IAlbum {
     id: string; // uuid v4
     name: string;
     year: number;
-    artistId: string | null; // refers to Artist
+    artistId?: string | null; // refers to Artist
   }
 @Entity()
 export class Album implements IAlbum{
@@ -15,9 +16,13 @@ export class Album implements IAlbum{
     @Column('int')
     year: number;
 
-    @ManyToOne(() => Artist)
-    artist: Artist;
+    @ManyToOne(() => Artist, artist => artist.id,{ onDelete: 'SET NULL' })
+    artist?: Artist;
 
-    @Column('uuid')
-    artistId: string | null; 
+    @Column({nullable: true})
+    artistId?: string | null; 
+
+    @ManyToMany(() => Favorite, favorite=>favorite.albums,{ onDelete: 'CASCADE' })
+    @JoinTable()
+    favorites: Favorite[];
 }

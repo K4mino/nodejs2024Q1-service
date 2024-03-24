@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, RelationId } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column,VersionColumn, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Favorite } from 'src/favorite/entities/favorite.entity';
 interface IArtist {
     id: string; // uuid v4
     name: string;
@@ -12,4 +13,7 @@ export class Artist implements IArtist{
     name: string;
     @Column('boolean')
     grammy: boolean;
+    @ManyToMany(() => Favorite,favorite=>favorite.artists ,{ onDelete: 'CASCADE' })
+    @JoinTable()
+    favorites: Favorite[];
 }

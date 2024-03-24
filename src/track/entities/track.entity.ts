@@ -5,8 +5,8 @@ import { Entity, PrimaryGeneratedColumn, Column,ManyToMany, CreateDateColumn, Up
 interface ITrack {
     id: string; // uuid v4
     name: string;
-    artistId: string | null; // refers to Artist
-    albumId: string | null; // refers to Album
+    artistId?: string | null; // refers to Artist
+    albumId?: string | null; // refers to Album
     duration: number; // integer number
   }
 @Entity()
@@ -15,16 +15,14 @@ export class Track implements ITrack{
     id: string; 
     @Column('text')
     name: string;
-    @ManyToOne(() => Artist, { onDelete: 'SET NULL' })
-    artist: Artist; 
-    @Column('uuid') 
-    artistId: string | null;
-    @ManyToOne(() => Album, { onDelete: 'SET NULL' })
-    album: Album; 
-    @Column('uuid')
-    albumId: string | null;
+    @ManyToOne(() => Artist, artist => artist.id,{ onDelete: 'SET NULL' })
+    artist?: Artist; 
+    @Column({nullable: true}) 
+    artistId?: string | null;
+    @ManyToOne(() => Album, album => album.id,{ onDelete: 'SET NULL' })
+    album?: Album; 
+    @Column({nullable: true})
+    albumId?: string | null;
     @Column('int')
     duration: number;
-    @ManyToMany(() => Favorite, favorite => favorite.tracks)
-    favorites: Favorite[];
 }
