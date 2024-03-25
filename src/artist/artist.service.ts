@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 } from 'uuid';
@@ -10,12 +14,12 @@ export class ArtistService {
   constructor(
     @InjectRepository(Artist)
     private readonly artistRepository: Repository<Artist>,
-  ){}
+  ) {}
   async create(createArtistDto: CreateArtistDto) {
     const artist = {
       ...createArtistDto,
       id: v4(),
-    }
+    };
 
     const newArtist = await this.artistRepository.create(artist);
 
@@ -26,11 +30,15 @@ export class ArtistService {
     return await this.artistRepository.find();
   }
 
-  async findOne(id: string) {
-    const artist= await this.artistRepository.findOne({ where: { id } });
+  async findOne(id: string, source?: string) {
+    const artist = await this.artistRepository.findOne({ where: { id } });
 
-    if(!artist){
-      throw new NotFoundException('Artist not found');
+    if (!artist) {
+      if (source === 'favs') {
+        throw new UnprocessableEntityException('Artist not found');
+      } else {
+        throw new NotFoundException('Artist not found');
+      }
     }
 
     return artist;
@@ -39,7 +47,7 @@ export class ArtistService {
   async update(id: string, updateArtistDto: UpdateArtistDto) {
     const artist = await this.artistRepository.findOne({ where: { id } });
 
-    if(!artist){
+    if (!artist) {
       throw new NotFoundException('Artist not found');
     }
 
@@ -53,7 +61,7 @@ export class ArtistService {
   async remove(id: string) {
     const artist = await this.artistRepository.findOne({ where: { id } });
 
-    if(!artist){
+    if (!artist) {
       throw new NotFoundException('Artist not found');
     }
 

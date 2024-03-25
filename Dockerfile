@@ -2,7 +2,7 @@
 FROM node:20.11.0-alpine AS dev
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 COPY . .
 
 # Stage 2: Build the application
@@ -13,7 +13,7 @@ RUN npm run build
 FROM node:20.11.0-alpine AS production
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production --legacy-peer-deps
 COPY --from=build /usr/src/app/dist ./dist
 EXPOSE 4000
 CMD ["npm", "run", "start:prod"]

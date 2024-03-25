@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { v4 } from 'uuid';
@@ -25,20 +29,24 @@ export class TrackService {
     return await this.trackRepository.find();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, source?: string) {
     const track = await this.trackRepository.findOne({ where: { id } });
 
-    if(!track){
-      throw new  NotFoundException('Track not found');
+    if (!track) {
+      if (source === 'favs') {
+        throw new UnprocessableEntityException('Track not found');
+      } else {
+        throw new NotFoundException('Track not found');
+      }
     }
 
-    return track
+    return track;
   }
 
   async update(id: string, updateTrackDto: UpdateTrackDto) {
     const track = await this.trackRepository.findOne({ where: { id } });
 
-    if(!track){
+    if (!track) {
       throw new NotFoundException('Track not found');
     }
 
@@ -46,16 +54,16 @@ export class TrackService {
 
     await this.trackRepository.save(track);
 
-    return track
+    return track;
   }
 
   async remove(id: string) {
     const track = await this.trackRepository.findOne({ where: { id } });
 
-    if(!track){
+    if (!track) {
       throw new NotFoundException('Track not found');
     }
-    
+
     return await this.trackRepository.delete(id);
   }
 }

@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode ,ParseUUIDPipe} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { FavoriteService } from './favorite.service';
-import { BadRequestException, ForbiddenException, NotFoundException, UnprocessableEntityException } from '@nestjs/common/exceptions';
 @Controller('favs')
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
@@ -25,14 +34,12 @@ export class FavoriteController {
     return this.favoriteService.addArtistToFavorites(id);
   }
 
-  
   @Delete('/track/:id')
   @HttpCode(204)
   removeTrack(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.favoriteService.deleteTrackFromFavorites(id);
   }
 
-  
   @Delete('/album/:id')
   @HttpCode(204)
   removeAlbum(@Param('id', new ParseUUIDPipe()) id: string) {

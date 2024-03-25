@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode,ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { validate } from 'uuid';
-import { validate as classValidate }  from 'class-validator';
 import { Put } from '@nestjs/common/decorators';
 @Controller('artist')
 export class ArtistController {
@@ -11,7 +19,6 @@ export class ArtistController {
 
   @Post()
   create(@Body() createArtistDto: CreateArtistDto) {
-
     return this.artistService.create(createArtistDto);
   }
 
@@ -21,18 +28,21 @@ export class ArtistController {
   }
 
   @Get(':id')
-  findOne(@Param('id',new ParseUUIDPipe()) id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.artistService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateArtistDto: UpdateArtistDto) {
+  update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
     return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id',new ParseUUIDPipe()) id: string) {
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.artistService.remove(id);
   }
 }

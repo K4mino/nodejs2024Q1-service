@@ -1,9 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode,ParseUUIDPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { validate } from 'uuid';
-import { validate as classValidate }  from 'class-validator';
 import { Put } from '@nestjs/common/decorators';
 @Controller('track')
 export class TrackController {
@@ -20,17 +28,20 @@ export class TrackController {
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.trackService.findOne(id)    ;
+    return this.trackService.findOne(id);
   }
 
   @Put(':id')
-  async update(@Param('id',new ParseUUIDPipe()) id: string, @Body() updateTrackDto: UpdateTrackDto) {
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() updateTrackDto: UpdateTrackDto,
+  ) {
     return this.trackService.update(id, updateTrackDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id',new ParseUUIDPipe()) id: string) {
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.trackService.remove(id);
   }
 }
