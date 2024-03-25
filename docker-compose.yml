@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  nestapp:
+    container_name: nestapp
+    image: nestapp:1.0.0
+    build:
+      context: .
+    ports:
+    - ${PORT}:${PORT}
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_DATABASE=${POSTGRES_DB}
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: postgres
+    container_name: db
+    ports:
+    - ${DB_PORT}:${DB_PORT}
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+volumes:
+  pgdata: {}
